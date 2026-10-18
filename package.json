@@ -1,0 +1,36 @@
+{
+  "name": "idealmakoo-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ideal Makoo multilingual Next.js frontend and server Google AI gateway",
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "node scripts/prepare-download.mjs && next build --webpack && node scripts/build-worker.mjs",
+    "start": "node --env-file-if-exists=.env.local scripts/serve.mjs",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && node scripts/verify.mjs",
+    "test": "node --test --test-isolation=none tests/*.test.mjs",
+    "package:source": "node scripts/prepare-download.mjs"
+  },
+  "dependencies": {
+    "next": "16.4.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "three": "0.180.0",
+    "lucide-react": "1.59.0",
+    "fflate": "0.8.2"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/three": "0.180.0",
+    "tailwindcss": "3.4.17",
+    "postcss": "^8.5.6",
+    "autoprefixer": "^10.4.21"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

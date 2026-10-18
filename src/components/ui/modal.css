@@ -1,0 +1,74 @@
+/* Explicit positioning wins over .glass { position: relative } and page-specific margins. */
+.app-dialog[data-viewport-dialog] {
+  --dialog-preferred-width: 650px;
+  position: fixed;
+  inset: auto;
+  left: var(--dialog-center-x, 50vw);
+  top: var(--dialog-center-y, 50dvh);
+  transform: translate(-50%, -50%);
+  margin: 0;
+  width: min(var(--dialog-preferred-width), var(--dialog-available-width, calc(100vw - 24px)));
+  max-width: var(--dialog-available-width, calc(100vw - 24px));
+  min-width: 0;
+  height: auto;
+  max-height: var(--dialog-available-height, calc(100dvh - 24px));
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scroll-padding-block: 90px 24px;
+  border: 1px solid var(--line-bright, var(--line));
+  border-radius: 24px;
+  color: var(--text);
+  font: inherit;
+  box-sizing: border-box;
+  isolation: isolate;
+}
+.app-dialog[data-viewport-dialog].search-dialog { --dialog-preferred-width: 720px; }
+.app-dialog[data-viewport-dialog].image-dialog { --dialog-preferred-width: 1050px; }
+.app-dialog[data-viewport-dialog].assistant-dialog { --dialog-preferred-width: 460px; }
+.app-dialog[data-viewport-dialog] .dialog-inner { min-width: 0; padding: 0 24px 24px; }
+.app-dialog[data-viewport-dialog] .dialog-inner > header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 -24px 20px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-strong);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+.app-dialog[data-viewport-dialog] .dialog-inner > header h2 {
+  min-width: 0;
+  margin: 0;
+  padding-block: 5px;
+  font-size: clamp(18px, 2.5vw, 24px);
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  max-height: 4.95em;
+  overflow: auto;
+}
+.app-dialog[data-viewport-dialog] .dialog-inner > header > button { flex: 0 0 44px; width: 44px; height: 44px; }
+.app-dialog[data-viewport-dialog] .dialog-inner > * { min-width: 0; max-width: 100%; }
+.app-dialog[data-viewport-dialog] :is(input, select, textarea) { max-width: 100%; }
+.app-dialog[data-viewport-dialog] .zoomed-image {
+  display: block;
+  max-width: 100%;
+  max-height: max(120px, calc(var(--dialog-available-height, 100dvh) - 130px));
+  width: auto;
+  height: auto;
+  margin-inline: auto;
+  object-fit: contain;
+}
+.app-dialog[data-viewport-dialog]::backdrop { background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px); }
+@media (max-width: 560px) {
+  .app-dialog[data-viewport-dialog] { border-radius: 19px; scroll-padding-block: 80px 18px; }
+  .app-dialog[data-viewport-dialog] .dialog-inner { padding-inline: 17px; padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+  .app-dialog[data-viewport-dialog] .dialog-inner > header { margin-inline: -17px; padding: 14px 17px; gap: 10px; }
+  .app-dialog[data-viewport-dialog] .dialog-inner > header h2 { font-size: 18px; }
+}

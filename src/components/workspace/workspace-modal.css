@@ -1,0 +1,151 @@
+/* Native top-layer workspace dialogs retain role typography without inheriting
+   the workspace grid, full-page size, transforms or a glass stacking context. */
+.ws-modal.ws-viewport-modal[data-viewport-dialog] {
+  --ws-dialog-preferred-width: 550px;
+  position: fixed;
+  inset: auto;
+  left: var(--dialog-center-x, 50vw);
+  top: var(--dialog-center-y, 50dvh);
+  transform: translate(-50%, -50%);
+  margin: 0;
+  width: min(var(--ws-dialog-preferred-width), var(--dialog-available-width, calc(100vw - 24px)));
+  max-width: var(--dialog-available-width, calc(100vw - 24px));
+  min-width: 0;
+  height: auto;
+  max-height: var(--dialog-available-height, calc(100dvh - 24px));
+  min-height: 0;
+  padding: 0;
+  grid-template-columns: none;
+  gap: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+  isolation: isolate;
+  border: 1px solid var(--line-bright, var(--line)) !important;
+  border-radius: 24px !important;
+  background: var(--panel-strong) !important;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.8;
+  text-align: start;
+  transition: none;
+  box-shadow: inset 0 1px 1px var(--glass-shine, #ffffff35), 0 24px 85px var(--glass-shadow, #0006) !important;
+}
+.ws-modal.ws-viewport-modal[data-viewport-dialog][open] { display: flex; flex-direction: column; }
+.ws-modal.ws-viewport-modal[data-viewport-dialog]:not([open]) { display: none; }
+.ws-modal.ws-viewport-modal[data-viewport-dialog].ws-modal-wide { --ws-dialog-preferred-width: 910px; }
+.ws-modal.ws-viewport-modal[data-viewport-dialog]::backdrop {
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+}
+.ws-viewport-modal[data-viewport-dialog] > .ws-modal-heading {
+  position: relative;
+  inset: auto;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  padding: 17px 22px;
+  gap: 14px;
+}
+.ws-viewport-modal[data-viewport-dialog] > .ws-modal-heading h2 {
+  flex: 1;
+  min-width: 0;
+  max-height: min(4.95em, calc(var(--dialog-available-height, 100dvh) * .35));
+  padding-block: 5px;
+  font-size: 17px;
+  line-height: 1.65;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+.ws-viewport-modal[data-viewport-dialog] > .ws-modal-heading .ws-icon-button {
+  flex: 0 0 44px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+}
+.ws-viewport-modal[data-viewport-dialog] > .ws-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  scroll-padding-block: 18px;
+  overflow-wrap: anywhere;
+}
+.ws-viewport-modal[data-viewport-dialog] > .ws-modal-body > * { min-width: 0; max-width: 100%; }
+.ws-viewport-modal[data-viewport-dialog] :is(input, textarea, select, img, video, iframe) { max-width: 100%; }
+.ws-viewport-modal[data-viewport-dialog] .ws-dialog-actions { flex-wrap: wrap; }
+@media (max-width: 600px) {
+  .ws-modal.ws-viewport-modal[data-viewport-dialog] { border-radius: 19px !important; }
+  .ws-viewport-modal[data-viewport-dialog] > .ws-modal-heading { padding: 13px 16px; gap: 10px; }
+  .ws-viewport-modal[data-viewport-dialog] > .ws-modal-heading h2 { font-size: 16px; }
+  .ws-viewport-modal[data-viewport-dialog] > .ws-modal-body { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .ws-viewport-modal[data-viewport-dialog].ws-root :is(input:not([type="checkbox"]):not([type="range"]), select, textarea) { font-size: 16px !important; }
+  .ws-viewport-modal[data-viewport-dialog] .ws-form-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media print {
+  html:has(dialog.ws-viewport-modal[open]), body:has(dialog.ws-viewport-modal[open]) { overflow: visible !important; }
+  body:has(dialog.ws-viewport-modal[open]) {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    padding-right: 0 !important;
+  }
+  /* Keep only the portal branch, including a portal inside fullscreen content. */
+  body:has(dialog.ws-viewport-modal[open]) > :not(dialog.ws-viewport-modal[open]):not(:has(dialog.ws-viewport-modal[open])),
+  body:has(dialog.ws-viewport-modal[open]) :has(dialog.ws-viewport-modal[open]) > :not(dialog.ws-viewport-modal[open]):not(:has(dialog.ws-viewport-modal[open])) { display: none !important; }
+  body:has(dialog.ws-viewport-modal[open]) :has(dialog.ws-viewport-modal[open]) {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .ws-modal.ws-viewport-modal[data-viewport-dialog][open] {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    color: #142033 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .ws-modal.ws-viewport-modal[data-viewport-dialog][open]:has(~ dialog.ws-viewport-modal[open]) { display: none !important; }
+  .ws-modal.ws-viewport-modal[data-viewport-dialog]::backdrop,
+  .ws-modal.ws-viewport-modal[data-viewport-dialog]::before,
+  .ws-modal.ws-viewport-modal[data-viewport-dialog]::after { display: none !important; }
+  .ws-viewport-modal[data-viewport-dialog] > .ws-modal-heading { background: #fff !important; }
+  .ws-viewport-modal[data-viewport-dialog] > .ws-modal-heading h2 { max-height: none; overflow: visible; }
+  .ws-viewport-modal[data-viewport-dialog] > .ws-modal-heading .ws-icon-button { display: none; }
+  .ws-viewport-modal[data-viewport-dialog] > .ws-modal-body {
+    display: block;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    scrollbar-gutter: auto;
+  }
+}

@@ -1,0 +1,62 @@
+'use client';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import{Suspense}from 'react';
+import {useSearchParams} from 'next/navigation';
+import{ArrowUpRight,LockKeyhole}from 'lucide-react';
+import {useApp}from '@/components/providers/AppProvider';
+import Navigation,{Brand,ThemeLanguage}from '@/components/site/Navigation';
+import Footer from '@/components/site/Footer';
+import Home,{AudiencePage}from '@/components/site/Home';
+import {ProductCatalog,ProductDetail,Comparison}from '@/components/site/Products';
+import {InquiryPage,CooperationPage,ContactPage,SingleRequestPage,TechnicalSelection,DistributorPage}from '@/components/site/Requests';
+import {ShadeMatcher,ProtocolTimer,Glossary,SerialCheck,FaqPage,PolicyPage}from '@/components/site/Tools';
+import{ResourceCenter,ResearchCenter,CompanyContent,EditorialCenter}from '@/components/content';
+import PublishedPage from '@/components/site/PublishedPage';
+import {PublicationContent} from '@/components/site/PublicationRenderer';
+import {usePublications} from '@/lib/publications';
+import {editablePublicTargets} from '@/lib/site-content';
+import Assistant from '@/components/site/Assistant';
+import InstallGuide from '@/components/site/InstallGuide';
+import{authorize,demoUsers}from '@/lib/auth';
+const loading=()=> <div className="site-loading"><span className="loading-orbit"/></div>;
+const Workspace=dynamic(()=>import('@/components/workspace/Workspace'),{loading});
+const AuthPage=dynamic(()=>import('@/components/account/AuthPage'),{loading});
+const AccountPortal=dynamic(()=>import('@/components/account/AccountPortal'),{loading});
+function CustomProductDetail(){const params=useSearchParams();return <ProductDetail id={params.get('id')||''}/>;}
+function PublicView({segments}:{segments:string[]}){const[section,slug,third]=segments;const path=segments.join('/');
+ const{locale}=useApp();const publications=usePublications();const editable=editablePublicTargets.some(target=>target.mode==='replace'&&target.slug===path);const override=editable?publications.find(item=>item.kind==='page'&&item.locale===locale&&item.slug===path):undefined;
+ if(override)return <div className="container page-content" data-managed-page={path}><PublicationContent item={override}/></div>;
+ if(!section)return <Home/>;
+ if(section==='products')return slug==='category'?<ProductCatalog category={third}/>:slug==='detail'?<CustomProductDetail/>:slug?<ProductDetail slug={slug}/>:<ProductCatalog/>;
+ if(section==='research')return <ResearchCenter slug={slug}/>;
+ if(section==='resources')return <ResourceCenter slug={slug}/>;
+ if(section==='compare')return <Comparison/>;
+ if(section==='inquiry-list')return <InquiryPage/>;
+ if(section==='technical-selection')return <TechnicalSelection/>;
+ if(section==='cooperation')return <CooperationPage section={slug}/>;
+ if(section==='contact'||section==='support')return <ContactPage support={section==='support'}/>;
+ if(section==='sample-request')return <SingleRequestPage kind="sample_request"/>;
+ if(section==='quality-report')return <SingleRequestPage kind="quality_complaint"/>;
+ if(section==='factory-visit')return <SingleRequestPage kind="factory_visit"/>;
+ if(path==='careers/apply')return <SingleRequestPage kind="job_application"/>;
+ if(section==='distributors')return <DistributorPage/>;
+ if(path==='tools/shade-mould-matcher')return <ShadeMatcher/>;
+ if(path==='tools/clinical-protocol')return <ProtocolTimer/>;
+ if(section==='for')return <AudiencePage audience={slug}/>;
+ if(section==='glossary')return <Glossary/>;
+ if(section==='faq')return <FaqPage/>;
+ if(section==='verify-product')return <SerialCheck/>;
+ if(section==='install')return <InstallGuide/>;
+ if(section==='privacy'||section==='terms')return <PolicyPage kind={section}/>;
+ if(section==='page'||section==='published')return <PublishedPage/>;
+ if(section==='knowledge')return <ResearchCenter/>;
+ if(['news','blog','events','careers','videos','media','press-kit'].includes(section))return <EditorialCenter section={section} slug={slug}/>;
+ return <CompanyContent section={section}/>;
+}
+export default function Application({segments=[]}:{segments?:string[]}){
+ const{locale,t,href,theme,role,session}=useApp();const[section,...rest]=segments;const isAdmin=section==='admin';
+ if(isAdmin){const active=rest.join('/');if(session&&authorize(role,active))return <><div className="site-background"/><Suspense fallback={loading()}><Workspace key={`${session.id}:${role}`} section={active}/></Suspense></>;return <><div className="site-background"/><div className="workspace-topbar"><Brand small/><div><span className="badge">{t('localMode')}</span><ThemeLanguage/><Link href={href()} className="text-link">{t('home')}<ArrowUpRight size={14}/></Link></div></div>{<section className="glass access-panel"><LockKeyhole size={43}/><h1>{t(session?'accessDenied':'loginTitle').replace('\n',' ')}</h1><p>{t('localAuth')}</p><Link className="btn btn-primary" href={href('auth/login')}>{t('demo')}<ArrowUpRight size={17}/></Link>{session&&<><Link className="btn" href={href(role==='customer'?'account':demoUsers.find(u=>u.role===role)?.route||'admin')}>{t('workspace')}</Link></>}</section>}</>;}
+ if(section==='auth')return <><div className="site-background"/><div className="auth-global-bar container"><Brand/><ThemeLanguage/></div><Suspense fallback={loading()}><AuthPage mode={rest[0]||'login'}/></Suspense></>;
+ return <><div className="site-background"/><a className="skip-link" href="#main-content">{t('discover')}</a><Navigation/><main id="main-content"><Suspense fallback={loading()}>{section==='account'?<AccountPortal key={`${session?.id||'guest'}:${role}`} section={rest.join('/')}/>:<PublicView segments={segments}/>}</Suspense></main><Footer/><Assistant/></>;
+}

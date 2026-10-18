@@ -1,0 +1,12 @@
+node_modules/
+.next/
+out/
+dist/
+.sites-runtime/
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+
+# Regenerated portable source download
+/public/downloads/idealmakoo-source.zip
